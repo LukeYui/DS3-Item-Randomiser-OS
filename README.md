@@ -2,6 +2,8 @@
 
 Made the mod open source, I had to rewrite it because even I didn't know what I was thinking back when it was made in 2018 - It might have better performance actually.
 
+You can find the original mod here: [Item Randomiser and Auto-equip (Dark Souls III)](https://www.nexusmods.com/darksouls3/mods/241)
+
 ## I want to make my own list
 
 To make your own list, you'll need to just swap out the "ItemList.txt" file with a list of your own. You can do this without needing to edit the source code so long as it's a list of 1600 items.
