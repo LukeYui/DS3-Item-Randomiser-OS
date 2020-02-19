@@ -1,0 +1,8 @@
+﻿  Assembling _NoRequirements.asm...
+     Creating library Z:\RE\Mods\DS3-Item-Randomiser-CPP\x64\Release\dinput8.lib and object Z:\RE\Mods\DS3-Item-Randomiser-CPP\x64\Release\dinput8.exp
+  Generating code
+  0 of 410 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  dinput8.vcxproj -> Z:\RE\Mods\DS3-Item-Randomiser-CPP\x64\Release\dinput8.dll
