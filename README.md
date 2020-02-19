@@ -20,7 +20,7 @@ If you've made something interesting and you want to share it with others, go ah
 
 ## It's broken!
 
-If you've made some custom modifications and it no longer works, I can't help you sorry. If it's something wrong with the code as is then report an issue [here.](https://github.com/LukeYui/DS3-Item-Randomiser-OS/issues)
+If you've made some custom modifications and it no longer works, I can't help you sorry. Saying that, if it's something wrong with the code as is then report an issue [here.](https://github.com/LukeYui/DS3-Item-Randomiser-OS/issues). Apologies, I don't have much time to play the game these days, so testing is limited.
 
 ## Libraries used
 
