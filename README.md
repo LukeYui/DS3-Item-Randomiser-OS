@@ -16,8 +16,13 @@ To test things out, you'll probably want the debug mode which just pops up a con
 
 If you've made something interesting and you want to share it with others, go ahead. I'd appreciate a credit/link back to this page though.
 
+## It's broken!
+
+If you've made some custom modifications and it no longer works, I can't help you sorry. If it's something wrong with the code as is then report an issue [here.](https://github.com/LukeYui/DS3-Item-Randomiser-OS/issues)
+
 ## Libraries used
 
-MinHook: https://github.com/TsudaKageyu/minhook
-INIReader: https://github.com/benhoyt/inih
-DLL_Wrapper_Generator (for the dinput8 wrapper): https://github.com/SeanPesce/DLL_Wrapper_Generator
+
+- MinHook: https://github.com/TsudaKageyu/minhook
+- INIReader: https://github.com/benhoyt/inih
+- DLL_Wrapper_Generator (for the dinput8 wrapper): https://github.com/SeanPesce/DLL_Wrapper_Generator
