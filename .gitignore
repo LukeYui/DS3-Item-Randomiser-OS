@@ -1,2 +1,6 @@
 
 *.tlog
+*.ipch
+.vs/dinput8/v15/.suo
+.vs/dinput8/v15/.suo
+*.db

@@ -5,8 +5,6 @@ CItemRandomiser *ItemRandomiser;
 CAutoEquip *AutoEquip;
 SCore* CoreStruct;
 
-
-int pOffsetList[1605];
 DWORD64 qItemEquipComms = 0;
 
 DWORD64 rItemRandomiser = 0;
@@ -16,11 +14,17 @@ DWORD64 rNoWeaponRequirements = 0;
 VOID CCore::Start() {
 
 	Core = new CCore();
+	CoreStruct = new SCore();
 	ItemRandomiser = new CItemRandomiser();
 	AutoEquip = new CAutoEquip();
-	CoreStruct = new SCore();
 
 	Core->DebugInit();
+
+	CoreStruct->hHeap = HeapCreate(8, 0x10000, 0);
+	if (!CoreStruct->hHeap) {
+		Core->Panic("Unable to allocate appropriate heap", "...\\Randomiser\\Core\\Core.cpp", FE_MemError, 1);
+		int3
+	};
 
 	if (!Core->Initialise()){
 		Core->Panic("Failed to initialise", "...\\Randomiser\\Core\\Core.cpp", FE_InitFailed, 1);
@@ -32,6 +36,15 @@ VOID CCore::Start() {
 		Sleep(5000);
 	};
 
+	if (!HeapFree(CoreStruct->hHeap, 8, CoreStruct->pItemArray)) {
+		Core->Panic("Given memory block appears invalid, or freed already", "...\\Randomiser\\Core\\Core.cpp", FE_InitFailed, 1);
+		int3
+	};
+
+	HeapDestroy(CoreStruct->hHeap);
+
+	delete AutoEquip;
+	delete ItemRandomiser;
 	delete CoreStruct;
 	delete Core;
 
@@ -64,9 +77,17 @@ BOOL CCore::Initialise() {
 	CoreStruct->dIsAutoSave = reader.GetBoolean("Randomiser", "SaveProgress", true);
 	CoreStruct->dRandomsieHealItems = reader.GetBoolean("Randomiser", "RandomiseHeals", true);
 	CoreStruct->dRandomiseKeyItems = reader.GetBoolean("Randomiser", "RandomiseKeys ", false);
-	CoreStruct->dIsMessageActive = reader.GetBoolean("Randomiser", "RandomsierMessage", true);
+	CoreStruct->dIsMessageActive = reader.GetBoolean("Randomiser", "RandomiserMessage", true);
 	CoreStruct->dIsAutoEquip = reader.GetBoolean("AutoEquip", "AutoEquipToggle", true);
 	CoreStruct->dIsNoWeaponRequirements = reader.GetBoolean("AutoEquip", "NoWeaponRequirements", true);
+
+	CoreStruct->pOffsetArray = (DWORD*)HeapAlloc(CoreStruct->hHeap, 8, 0x3000);
+	CoreStruct->pItemArray = (DWORD*)HeapAlloc(CoreStruct->hHeap, 8, 0x3000);
+
+	if ((!CoreStruct->pItemArray) || (!CoreStruct->pOffsetArray)) {
+		Core->Panic("Out of memory", "...\\Randomiser\\Core\\Core.cpp", FE_MemError, 1);
+		int3
+	};
 
 #ifdef DEBUG
 	sprintf_s(pBuffer, "[Randomiser] - SaveProgress = %i\n", CoreStruct->dIsAutoSave);
@@ -85,8 +106,8 @@ BOOL CCore::Initialise() {
 
 	GetArrayList();
 
-	while (!pOffsetList[i]) {
-		pItemArray[0]++;
+	while (!CoreStruct->pOffsetArray[i]) {
+		CoreStruct->pItemArray[0]++;
 		i++;
 	}; 
 
@@ -111,7 +132,7 @@ BOOL CCore::GetArrayList() {
 	if (readfileA.is_open()) {
 
 		while (i < (MAX_LIST_ITEMS + 1)) {
-			readfileA >> pOffsetList[i];
+			readfileA >> CoreStruct->pOffsetArray[i];
 			i++;
 		};
 		readfileA.close();
@@ -122,7 +143,7 @@ BOOL CCore::GetArrayList() {
 	if (readfileB.is_open()) {
 
 		while (i < (MAX_LIST_ITEMS + 1)) {
-			readfileB >> std::hex >> pItemArray[i];
+			readfileB >> std::hex >> CoreStruct->pItemArray[i];
 			i++;
 		};
 		readfileB.close();
@@ -143,7 +164,7 @@ BOOL CCore::SaveArrayList() {
 	if (outfile.is_open()) {
 
 		while (i < (MAX_LIST_ITEMS + 1)) {
-			outfile << pOffsetList[i] << std::endl;
+			outfile << CoreStruct->pOffsetArray[i] << std::endl;
 			i++;
 		};
 		outfile.close();
@@ -185,11 +206,9 @@ VOID CCore::Panic(char* pMessage, char* pSort, DWORD dError, DWORD dIsFatalError
 	else {
 		if (dIsFatalError){
 			sprintf_s(pTitle, "[Item Randomiser - Fatal Error]");
-			sprintf_s(pOutput, "A fatal error occured: %s\n", pOutput);
 		} 
 		else {
 			sprintf_s(pTitle, "[Item Randomiser - Error]");
-			sprintf_s(pOutput, "An exception has occured: %s\n", pOutput);
 		}; 
 		
 		MessageBoxA(NULL, pOutput, pTitle, MB_ICONERROR);

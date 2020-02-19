@@ -11,7 +11,7 @@ DWORD pHandsList[100];
 DWORD pLegsList[105];
 
 VOID fAutoEquip(UINT_PTR pItemBuffer, DWORD64 pItemData, DWORD64 qReturnAddress) {
-	if (*(DWORD*)(pItemData + 0x04) == 0) AutoEquip->AutoEquipItem(pItemBuffer, qReturnAddress);
+	if (*(int*)(pItemData) >= 0) AutoEquip->AutoEquipItem(pItemBuffer, qReturnAddress);
 	return;
 };
 

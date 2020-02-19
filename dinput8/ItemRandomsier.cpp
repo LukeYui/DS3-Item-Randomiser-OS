@@ -6,11 +6,10 @@ extern SCore* CoreStruct;
 DWORD pUniqueItems[25];
 DWORD pCappedItems[250];
 DWORD pSpecialWeapons[170];
-DWORD pItemArray[(MAX_LIST_ITEMS + 5)];
 
 VOID fItemRandomiser(UINT_PTR qWorldChrMan, UINT_PTR pItemBuffer, UINT_PTR pItemData, DWORD64 qReturnAddress) {
 
-	if (*(DWORD*)(pItemData + 0x04) == 0) ItemRandomiser->RandomiseItem(qWorldChrMan, pItemBuffer, pItemData, qReturnAddress);
+	if (*(int*)(pItemData) >= 0) ItemRandomiser->RandomiseItem(qWorldChrMan, pItemBuffer, pItemData, qReturnAddress);
 
 	return;
 };
@@ -43,15 +42,15 @@ VOID CItemRandomiser::RandomiseItem(UINT_PTR qWorldChrMan, UINT_PTR pItemBuffer,
 			if ((dItemID == 0x4000085D ) || (dItemID == 0x4000085F)) return;
 		};
 
-		if (pItemArray[0] < MAX_LIST_ITEMS) {
-			dItemID = pItemArray[pOffsetList[pItemArray[0]]]; //Grab new item
-			pOffsetList[pItemArray[0]] = 0;
+		if (CoreStruct->pItemArray[0] < MAX_LIST_ITEMS) {
+			dItemID = CoreStruct->pItemArray[CoreStruct->pOffsetArray[CoreStruct->pItemArray[0]]]; //Grab new item
+			CoreStruct->pOffsetArray[CoreStruct->pItemArray[0]] = 0;
 		} 
 		else {
-			dItemID = pItemArray[pOffsetList[RandomiseNumber(1, MAX_LIST_ITEMS)]]; //Default to random item list
+			dItemID = CoreStruct->pItemArray[CoreStruct->pOffsetArray[RandomiseNumber(1, MAX_LIST_ITEMS)]]; //Default to random item list
 		};
 
-		pItemArray[0]++;
+		CoreStruct->pItemArray[0]++;
 
 		SortNewItem(&dItemID, &dItemQuantity);
 
@@ -241,11 +240,16 @@ extern DWORD pCappedItems[250] = {
 	0x40000836,	0x40000837,
 	0x40000838, 0x40000839,
 	0x4000083A,	0x4000083B,
-	0x4000083C,	0x4000083D,
-	0x4000083E,	0x4000083F,
-	0x40000840,	0x40000841,
-	0x40000842,	0x40000843,
-	0x40000844,	0x40000845,
+	0x4000083C,	
+	0x4000083D,
+	0x4000083E,
+	0x4000083F,
+	0x40000840,
+	0x40000841,
+	0x40000842,
+	0x40000843,
+	0x40000844,
+	0x40000845,
 	0x40000846,
 	0x40000847,
 	0x40000848,
@@ -598,9 +602,5 @@ extern DWORD pSpecialWeapons[170] = {
 	0x01511110,
 	0x01518640,
 	0x01437C80,
-	0x00000000,
-};
-
-extern DWORD pItemArray[(MAX_LIST_ITEMS + 5)] = {
 	0x00000000,
 };
