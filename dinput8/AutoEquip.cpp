@@ -68,12 +68,12 @@ BOOL CAutoEquip::SortItem(DWORD dItemID, SEquipBuffer* E) {
 	switch (dItemType) {
 	case(ItemType_Weapon): {
 		if ((dItemID >> 0x10) == 6) return false; //Don't equip ammo
-		if ((dItemID & 0xFF000000) >> 4 != 0x10000000) dEquipSlot = 1; //If these conditions are met, it's a shield.
+		if ((dItemID & 0xFF000000) << 4 != 0x10000000) dEquipSlot = 1; //If these conditions are met, it's a shield.
 		break;
 	};
 	case(ItemType_Protector): {
 		if (FindEquipType(dItemID, &pHelmetList[0])) dEquipSlot = 0x0C;
-		else if(FindEquipType(dItemID, &pBodyList[0])) dEquipSlot = 0x0D;
+		else if (FindEquipType(dItemID, &pBodyList[0])) dEquipSlot = 0x0D;
 		else if (FindEquipType(dItemID, &pHandsList[0])) dEquipSlot = 0x0E;
 		else if (FindEquipType(dItemID, &pLegsList[0])) dEquipSlot = 0x0F;
 		break;

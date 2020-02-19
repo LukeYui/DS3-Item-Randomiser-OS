@@ -55,6 +55,10 @@ VOID CItemRandomiser::RandomiseItem(UINT_PTR qWorldChrMan, UINT_PTR pItemBuffer,
 
 		SortNewItem(&dItemID, &dItemQuantity);
 
+		if ((dItemID == 0x4000085D) || (dItemID == 0x4000085F)) {
+			if (!CoreStruct->dRandomsieHealItems) dItemID = 0x400001F4;
+		};
+
 		DebugItemPrint(*(int*)(pItemBuffer), *(int*)(pItemBuffer + 0x04), dItemID, dItemQuantity);
 		
 		*(int*)(pItemBuffer) = dItemID;
@@ -65,7 +69,7 @@ VOID CItemRandomiser::RandomiseItem(UINT_PTR qWorldChrMan, UINT_PTR pItemBuffer,
 		pItemBuffer += 0x0C;
 	};
 
-	if (CoreStruct->dIsAutoSave) Core->SaveArrayList();
+	CoreStruct->dIsListChanged++;
 
 	return;
 
@@ -82,7 +86,6 @@ VOID CItemRandomiser::SortNewItem(DWORD* dItem, DWORD* dQuantity) {
 	dItemType = (*dItem >> 0x1C);
 	dItemSortID = (*dItem & 0x0FFFFFF);
 
-
 	switch (dItemType) {
 	
 	case(ItemType_Weapon): {
@@ -90,7 +93,7 @@ VOID CItemRandomiser::SortNewItem(DWORD* dItem, DWORD* dQuantity) {
 		*dQuantity = 1;
 
 		if ((*dItem >> 0x10) == 6) {
-			//Ammo
+			*dQuantity = RandomiseNumber(1, 99);
 			return;
 		};
 
@@ -134,7 +137,6 @@ VOID CItemRandomiser::SortNewItem(DWORD* dItem, DWORD* dQuantity) {
 		*dItem = 0x400001F4;
 		*dQuantity = 1;
 	};
-	
 	
 	};
 

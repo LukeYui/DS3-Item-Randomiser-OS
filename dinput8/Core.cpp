@@ -28,9 +28,8 @@ VOID CCore::Start() {
 	};
 
 	while (true) {
-	
 		Core->Run();
-		Sleep(500);
+		Sleep(5000);
 	};
 
 	delete CoreStruct;
@@ -41,6 +40,14 @@ VOID CCore::Start() {
 
 VOID CCore::Run() {
 
+	if ((CoreStruct->dIsAutoSave) && CoreStruct->dIsListChanged) {
+		Core->SaveArrayList();
+		CoreStruct->dIsListChanged--;
+	};
+
+	if (CoreStruct->dIsMessageActive) {
+		DisplayInfoMsg();
+	};
 
 	return;
 };
@@ -89,6 +96,7 @@ BOOL CCore::Initialise() {
 	if (CoreStruct->dIsNoWeaponRequirements) bReturn &= Hook(0x140C073B9, (DWORD64)&tNoWeaponRequirements, &rNoWeaponRequirements, 7);
 
 	AutoEquip->EquipItem = (fEquipItem*)0x140AFBBB0;
+	Core->DisplayGraveMessage = (fDisplayGraveMessage*)0x140BE1990;
 
 	return bReturn;
 };
@@ -176,6 +184,31 @@ VOID CCore::Panic(char* pMessage, char* pSort, DWORD dError, DWORD dIsFatalError
 	};
 
 	if (dIsFatalError) *(int*)0 = 0;
+
+	return;
+};
+
+VOID CCore::DisplayInfoMsg() {
+	/*
+	UINT_PTR qLuaEvent = 0;
+	UINT_PTR qWorldChrMan = 0;
+
+	qLuaEvent = *(UINT_PTR*)CoreStruct->qSprjLuaEvent;
+	if (!qLuaEvent) return;
+
+	qWorldChrMan = *(UINT_PTR*)CoreStruct->qWorldChrMan;
+	if (!qWorldChrMan) return;
+	qWorldChrMan = *(UINT_PTR*)(qWorldChrMan + 0x80);
+	if (!qWorldChrMan) return;
+
+	if (!Core->DisplayGraveMessage) {
+		Core->Panic("Bad function call", "...\\Source\\Core\\Core.cpp", FE_BadFunc, 1);
+		int3
+	};
+
+	Core->DisplayGraveMessage(0x33333333);
+	*/
+	CoreStruct->dIsMessageActive = 0;
 
 	return;
 };

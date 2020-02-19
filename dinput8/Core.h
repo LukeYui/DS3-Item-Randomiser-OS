@@ -27,6 +27,7 @@ struct SCore;
 struct SEquipBuffer;
 
 typedef VOID fEquipItem(DWORD dSlot, SEquipBuffer* E);
+typedef VOID fDisplayGraveMessage(DWORD dEvent);
 
 class CCore {
 public:
@@ -38,6 +39,9 @@ public:
 	virtual BOOL Hook(DWORD64 qAddress, DWORD64 qDetour, DWORD64* pReturn, DWORD dByteLen);
 	virtual VOID Panic(char* pMessage, char* pSort, DWORD dError, DWORD dIsFatalError);
 	virtual VOID DebugInit();
+	virtual VOID DisplayInfoMsg();
+private:
+	fDisplayGraveMessage* DisplayGraveMessage;
 };
 
 class CItemRandomiser {
@@ -68,7 +72,10 @@ struct SCore {
 	DWORD dIsAutoEquip;
 	DWORD dIsNoWeaponRequirements;
 	DWORD dIsMessageActive;
+	DWORD dIsListChanged;
 	UINT_PTR qLocalPlayer = 0x144740178;
+	UINT_PTR qWorldChrMan = 0x144768E78;
+	UINT_PTR qSprjLuaEvent = 0x14473A9C8;
 };
 
 struct SEquipBuffer {
