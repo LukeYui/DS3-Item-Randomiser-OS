@@ -105,15 +105,27 @@ BOOL CCore::GetArrayList() {
 
 	int i = 0;
 
-	std::ifstream readfile("DS3RandomAoB.txt");
+	std::ifstream readfileA("DS3RandomAoB.txt");
+	std::ifstream readfileB("DS3ItemAoB.txt");
 
-	if (readfile.is_open()) {
+	if (readfileA.is_open()) {
 
 		while (i < (MAX_LIST_ITEMS + 1)) {
-			readfile >> pOffsetList[i];
+			readfileA >> pOffsetList[i];
 			i++;
 		};
-		readfile.close();
+		readfileA.close();
+	};
+
+	i = 1;
+
+	if (readfileB.is_open()) {
+
+		while (i < (MAX_LIST_ITEMS + 1)) {
+			readfileB >> std::hex >> pItemArray[i];
+			i++;
+		};
+		readfileB.close();
 		return true;
 	};
 

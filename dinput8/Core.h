@@ -10,7 +10,7 @@
 #define ItemType_Accessory 2
 #define ItemType_Goods 4
 #define int3 __debugbreak();
-#define DEBUG
+//#define DEBUG
 
 #define FE_InitFailed 0
 #define FE_AmountTooHigh 1
