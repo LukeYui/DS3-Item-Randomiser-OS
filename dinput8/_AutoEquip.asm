@@ -35,6 +35,7 @@ _tAutoEquip PROC
 	mov rbp,rsp
 	and rsp,-010h
 	mov rcx,[qItemEquipComms]
+	lea rdx,[rcx-010h]
 	call fAutoEquip
 	mov rsp,rbp
 	mov rax,[rsp+050h]

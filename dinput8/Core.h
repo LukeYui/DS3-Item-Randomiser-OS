@@ -90,7 +90,7 @@ extern "C" VOID fItemRandomiser(UINT_PTR qWorldChrMan, UINT_PTR pItemBuffer, UIN
 
 extern "C" DWORD64 rAutoEquip;
 extern "C" VOID tAutoEquip();
-extern "C" VOID fAutoEquip(UINT_PTR pItemBuffer, DWORD64 qReturnAddress);
+extern "C" VOID fAutoEquip(UINT_PTR pItemBuffer, DWORD64 pItemData, DWORD64 qReturnAddress);
 
 extern "C" DWORD64 rNoWeaponRequirements;
 extern "C" VOID tNoWeaponRequirements();

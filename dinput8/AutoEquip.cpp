@@ -4,15 +4,14 @@ extern CCore* Core;
 extern CAutoEquip* AutoEquip;
 extern SCore* CoreStruct;
 
-
-DWORD dRingSlotSelect;
+DWORD dRingSlotSelect = 0x11;
 DWORD pHelmetList[110];
 DWORD pBodyList[105];
 DWORD pHandsList[100];
 DWORD pLegsList[105];
 
-VOID fAutoEquip(UINT_PTR pItemBuffer, DWORD64 qReturnAddress) {
-	AutoEquip->AutoEquipItem(pItemBuffer, qReturnAddress);
+VOID fAutoEquip(UINT_PTR pItemBuffer, DWORD64 pItemData, DWORD64 qReturnAddress) {
+	if (*(DWORD*)(pItemData + 0x04) == 0) AutoEquip->AutoEquipItem(pItemBuffer, qReturnAddress);
 	return;
 };
 
@@ -32,7 +31,7 @@ VOID CAutoEquip::AutoEquipItem(UINT_PTR pItemBuffer, DWORD64 qReturnAddress) {
 	dItemAmount = *(int*)pItemBuffer;
 	pItemBuffer += 4;
 
-	if ((dItemAmount < 1) || (dItemAmount > 8)) {
+	if (dItemAmount > 6) {
 		Core->Panic("Too many items!", "...\\Source\\AutoEquip\\AutoEquip.cpp", FE_AmountTooHigh, 1);
 		int3
 	};
@@ -52,6 +51,7 @@ VOID CAutoEquip::AutoEquipItem(UINT_PTR pItemBuffer, DWORD64 qReturnAddress) {
 		};
 	
 		dItemAmount--;
+		pItemBuffer += 0x0C;
 	};
 
 	return;
@@ -74,12 +74,12 @@ BOOL CAutoEquip::SortItem(DWORD dItemID, SEquipBuffer* E) {
 	case(ItemType_Protector): {
 		if (FindEquipType(dItemID, &pHelmetList[0])) dEquipSlot = 0x0C;
 		else if(FindEquipType(dItemID, &pBodyList[0])) dEquipSlot = 0x0D;
-		else if (FindEquipType(dItemID, &pHandsList[0])) dEquipSlot = 0x0D;
-		else if (FindEquipType(dItemID, &pLegsList[0])) dEquipSlot = 0x0D;
+		else if (FindEquipType(dItemID, &pHandsList[0])) dEquipSlot = 0x0E;
+		else if (FindEquipType(dItemID, &pLegsList[0])) dEquipSlot = 0x0F;
 		break;
 	};
 	case(ItemType_Accessory): {
-		if (dRingSlotSelect <= 0x15) dRingSlotSelect = 0x11;
+		if (dRingSlotSelect >= 0x15) dRingSlotSelect = 0x11;
 		dEquipSlot = dRingSlotSelect;
 		dRingSlotSelect++;
 		break;

@@ -9,7 +9,9 @@ DWORD pSpecialWeapons[170];
 DWORD pItemArray[1605];
 
 VOID fItemRandomiser(UINT_PTR qWorldChrMan, UINT_PTR pItemBuffer, UINT_PTR pItemData, DWORD64 qReturnAddress) {
-	ItemRandomiser->RandomiseItem(qWorldChrMan, pItemBuffer, pItemData, qReturnAddress);
+
+	if (*(DWORD*)(pItemData + 0x04) == 0) ItemRandomiser->RandomiseItem(qWorldChrMan, pItemBuffer, pItemData, qReturnAddress);
+
 	return;
 };
 
@@ -23,7 +25,7 @@ VOID CItemRandomiser::RandomiseItem(UINT_PTR qWorldChrMan, UINT_PTR pItemBuffer,
 	dItemAmount = *(int*)pItemBuffer;
 	pItemBuffer += 4;
 
-	if ((dItemAmount < 1) || (dItemAmount > 8)) {
+	if (dItemAmount > 6) {
 		Core->Panic("Too many items!", "...\\Source\\ItemRandomiser\\ItemRandomiser.cpp", FE_AmountTooHigh, 1);
 		int3
 	};
@@ -43,7 +45,7 @@ VOID CItemRandomiser::RandomiseItem(UINT_PTR qWorldChrMan, UINT_PTR pItemBuffer,
 
 		if (pItemArray[0] < MAX_LIST_ITEMS) {
 			dItemID = pItemArray[pOffsetList[pItemArray[0]]]; //Grab new item
-			pItemArray[pOffsetList[pItemArray[0]]] = 0;
+			pOffsetList[pItemArray[0]] = 0;
 		} 
 		else {
 			dItemID = pItemArray[pOffsetList[RandomiseNumber(1, MAX_LIST_ITEMS)]]; //Default to random item list
@@ -57,7 +59,7 @@ VOID CItemRandomiser::RandomiseItem(UINT_PTR qWorldChrMan, UINT_PTR pItemBuffer,
 		
 		*(int*)(pItemBuffer) = dItemID;
 		*(int*)(pItemBuffer + 0x04) = dItemQuantity;
-		*(int*)(pItemBuffer + 0x08) = dItemDurability;
+		*(int*)(pItemBuffer + 0x08) = -1;
 	
 		dItemAmount--;
 		pItemBuffer += 0x0C;
@@ -100,7 +102,11 @@ VOID CItemRandomiser::SortNewItem(DWORD* dItem, DWORD* dQuantity) {
 
 		if (!bPlayerUpgradeLevel) return;
 
-		if (IsWeaponSpecialType(*dItem)) bPlayerUpgradeLevel >>= 1;
+		if (IsWeaponSpecialType(*dItem)) {
+			bPlayerUpgradeLevel >>= 1;
+			*dItem += RandomiseNumber(0, bPlayerUpgradeLevel);
+			return;
+		};
 
 		*dItem += RandomiseNumber(0, bPlayerUpgradeLevel);
 		*dItem += (RandomiseNumber(0, 15) * 100);
@@ -592,6 +598,7 @@ extern DWORD pSpecialWeapons[170] = {
 	0x01437C80,
 	0x00000000,
 };
+
 extern DWORD pItemArray[1605] = {
 	0x00000000,
 	0x4000012B,

@@ -101,7 +101,7 @@ BOOL CCore::GetArrayList() {
 
 	if (readfile.is_open()) {
 
-		while (i < 1601) {
+		while (i < (MAX_LIST_ITEMS + 1)) {
 			readfile >> pOffsetList[i];
 			i++;
 		};
@@ -122,18 +122,18 @@ BOOL CCore::SaveArrayList() {
 
 	if (outfile.is_open()) {
 
-		while (i < 1601) {
+		while (i < (MAX_LIST_ITEMS + 1)) {
 			outfile << pOffsetList[i] << std::endl;
 			i++;
 		};
 		outfile.close();
 		return true;
-
 	};
 
 	MessageBoxA(NULL, "The randomiser failed to find DS3RandomAoB.txt in the game directory, please restore this file. If this persists please inform LukeYui via the modpage.", "Save Error", MB_ICONWARNING);
 
 	return false;
+
 };
 
 BOOL CCore::Hook(DWORD64 qAddress, DWORD64 qDetour, DWORD64* pReturn, DWORD dByteLen) {
