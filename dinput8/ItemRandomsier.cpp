@@ -47,7 +47,7 @@ VOID CItemRandomiser::RandomiseItem(UINT_PTR qWorldChrMan, UINT_PTR pItemBuffer,
 			CoreStruct->pOffsetArray[CoreStruct->pItemArray[0]] = 0;
 		} 
 		else {
-			dItemID = CoreStruct->pItemArray[CoreStruct->pOffsetArray[RandomiseNumber(1, MAX_LIST_ITEMS)]]; //Default to random item list
+			dItemID = CoreStruct->pItemArray[RandomiseNumber(1, MAX_LIST_ITEMS)]; //Default to random item list
 		};
 
 		CoreStruct->pItemArray[0]++;
@@ -56,6 +56,10 @@ VOID CItemRandomiser::RandomiseItem(UINT_PTR qWorldChrMan, UINT_PTR pItemBuffer,
 
 		if ((dItemID == 0x4000085D) || (dItemID == 0x4000085F)) {
 			if (!CoreStruct->dRandomsieHealItems) dItemID = 0x400001F4;
+		};
+
+		if (!CoreStruct->dRandomiseKeyItems) {
+			if (IsGameProgressionItem(dItemID)) dItemID = 0x400001F4;
 		};
 
 		DebugItemPrint(*(int*)(pItemBuffer), *(int*)(pItemBuffer + 0x04), dItemID, dItemQuantity);
