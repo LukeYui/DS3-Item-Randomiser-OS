@@ -1,14 +1,14 @@
 # Dark Souls III Item Randomiser (C++)
 
-Made the mod open source, I had to rewrite it because even I didn't know what I was thinking back when it was made in 2018 - It might have better performance actually.
+Made the item randomiser for DS3 open source, I had to rewrite it because even I didn't know what I was thinking back when it was made in 2018 - This might have better performance actually.
 
 You can find the original mod here: [Item Randomiser and Auto-equip (Dark Souls III)](https://www.nexusmods.com/darksouls3/mods/241)
 
 ## I want to make my own list
 
-To make your own list, you'll need to just swap out the "ItemList.txt" file with a list of your own. You can do this without needing to edit the source code so long as it's a list of 1600 items.
+To make your own list, you'll need to just swap out the "DS3ItemAoB.txt" file with a list of your own. You can do this without needing to edit the source code so long as it's a list of 1600 items.
 
-If you want to customise it further, with a custom length list, you'll need to edit the source code. You can just change the `#define MAX_LIST_ITEMS 1600` to a number of your choosing, then it should work. 
+If you want to customise it further, with a custom length list, you'll need to edit the source code. You'll need to change the length of the arrays the code reads in `Core.cpp` to a number of your choosing, then it should work. You might also have to allocate more memory.
 
 If you want to make your own complex list, with exceptions and rules (e.g not infusing/upgrading certain weapons) you'll need to modify the hardcoded lists in the mod. You can find them in "ItemRandomiser\ItemRandomiser.cpp". I know my code is pretty horrible to look at though, so it might just be a case of trial and error until it works. I'll upload the AoBRandomiser.exe source later.
 
@@ -23,7 +23,6 @@ If you've made something interesting and you want to share it with others, go ah
 If you've made some custom modifications and it no longer works, I can't help you sorry. If it's something wrong with the code as is then report an issue [here.](https://github.com/LukeYui/DS3-Item-Randomiser-OS/issues)
 
 ## Libraries used
-
 
 - MinHook: https://github.com/TsudaKageyu/minhook
 - INIReader: https://github.com/benhoyt/inih
