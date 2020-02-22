@@ -10,6 +10,7 @@ DWORD64 qItemEquipComms = 0;
 DWORD64 rItemRandomiser = 0;
 DWORD64 rAutoEquip = 0;
 DWORD64 rNoWeaponRequirements = 0;
+DWORD64 rEquipLock = 0;
 
 VOID CCore::Start() {
 
@@ -33,7 +34,7 @@ VOID CCore::Start() {
 
 	while (true) {
 		Core->Run();
-		Sleep(5000);
+		Sleep(2500);
 	};
 
 	if (!HeapFree(CoreStruct->hHeap, 8, CoreStruct->pItemArray)) {
@@ -72,6 +73,11 @@ BOOL CCore::Initialise() {
 	BOOL bReturn = true;
 	INIReader reader("RandomiserPreferences.ini");
 
+	if (reader.ParseError() == -1) {
+		MessageBoxA(NULL, "Failed to find 'RandomiserPreferences.ini'.", "Load Error", MB_ICONWARNING);
+		int3
+	};
+
 	if (MH_Initialize() != MH_OK) return false;
 
 	CoreStruct->dIsAutoSave = reader.GetBoolean("Randomiser", "SaveProgress", true);
@@ -79,7 +85,8 @@ BOOL CCore::Initialise() {
 	CoreStruct->dRandomiseKeyItems = reader.GetBoolean("Randomiser", "RandomiseKeys ", false);
 	CoreStruct->dIsMessageActive = reader.GetBoolean("Randomiser", "RandomiserMessage", true);
 	CoreStruct->dIsAutoEquip = reader.GetBoolean("AutoEquip", "AutoEquipToggle", true);
-	CoreStruct->dIsNoWeaponRequirements = reader.GetBoolean("AutoEquip", "NoWeaponRequirements", true);
+	CoreStruct->dLockEquipSlots = reader.GetBoolean("AutoEquip", "LockEquipSlots", false);
+	CoreStruct->dIsNoWeaponRequirements = reader.GetBoolean("AutoEquip", "NoWeaponRequirements", false);
 
 	CoreStruct->pOffsetArray = (DWORD*)HeapAlloc(CoreStruct->hHeap, 8, 0x3000);
 	CoreStruct->pItemArray = (DWORD*)HeapAlloc(CoreStruct->hHeap, 8, 0x3000);
@@ -100,6 +107,8 @@ BOOL CCore::Initialise() {
 	printf_s(pBuffer);
 	sprintf_s(pBuffer, "[AutoEquip] - AutoEquipToggle = %i\n", CoreStruct->dIsAutoEquip);
 	printf_s(pBuffer);
+	sprintf_s(pBuffer, "[AutoEquip] - LockEquipSlots = %i\n", CoreStruct->dLockEquipSlots);
+	printf_s(pBuffer);
 	sprintf_s(pBuffer, "[AutoEquip] - NoWeaponRequirements = %i\n", CoreStruct->dIsNoWeaponRequirements);
 	printf_s(pBuffer);
 #endif
@@ -110,6 +119,10 @@ BOOL CCore::Initialise() {
 		CoreStruct->pItemArray[0]++;
 		i++;
 	}; 
+
+	if (CoreStruct->dLockEquipSlots) {
+		LockEquipSlots();
+	};
 
 	bReturn &= Hook(0x1407BBA80, (DWORD64)&tItemRandomiser, &rItemRandomiser, 5);
 
@@ -136,7 +149,9 @@ BOOL CCore::GetArrayList() {
 			i++;
 		};
 		readfileA.close();
-	};
+
+	}
+	else MessageBoxA(NULL, "Failed to find 'DS3RandomAoB.txt'", "Load Error", MB_ICONWARNING);
 
 	i = 1;
 
@@ -150,7 +165,7 @@ BOOL CCore::GetArrayList() {
 		return true;
 	};
 
-	MessageBoxA(NULL, "The randomiser failed to find DS3RandomAoB.txt in the game directory. Please use the .exe that came with the mod to generate a list and then move it into your DarkSoulsIII.exe folder.", "Load Error", MB_ICONWARNING);
+	MessageBoxA(NULL, "Failed to find 'DS3ItemAoB.txt'", "Load Error", MB_ICONWARNING);
 
 	return false;
 };
@@ -171,7 +186,9 @@ BOOL CCore::SaveArrayList() {
 		return true;
 	};
 
-	MessageBoxA(NULL, "The randomiser failed to find DS3RandomAoB.txt in the game directory, please restore this file. If this persists please inform LukeYui via the modpage.", "Save Error", MB_ICONWARNING);
+	CoreStruct->dIsAutoSave = 0;
+	MessageBoxA(NULL, "Failed to find 'DS3RandomAoB.txt'", "Save Error", MB_ICONWARNING);
+
 
 	return false;
 
@@ -240,6 +257,24 @@ VOID CCore::DisplayInfoMsg() {
 	Core->DisplayGraveMessage(0x33333333);
 	*/
 	CoreStruct->dIsMessageActive = 0;
+
+	return;
+};
+
+VOID CCore::LockEquipSlots() {
+
+	DWORD dOldProtect = 0;
+	DWORD64 qEquip = 0x140B70F45;
+	DWORD64 qUnequip = 0x140B736EA;
+
+	if (!VirtualProtect((LPVOID)qEquip, 1, PAGE_EXECUTE_READWRITE, &dOldProtect)) return;
+	if (!VirtualProtect((LPVOID)qUnequip, 1, PAGE_EXECUTE_READWRITE, &dOldProtect)) return;
+
+	*(BYTE*)qEquip = 0x30;
+	*(BYTE*)qUnequip = 0x30;
+
+	if (!VirtualProtect((LPVOID)qEquip, 1, dOldProtect, &dOldProtect)) return;
+	if (!VirtualProtect((LPVOID)qUnequip, 1, dOldProtect, &dOldProtect)) return;
 
 	return;
 };

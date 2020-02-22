@@ -202,7 +202,7 @@ DWORD CItemRandomiser::RandomiseNumber(DWORD dMin, DWORD dMax) {
 VOID CItemRandomiser::DebugItemPrint(DWORD dOldItem, DWORD dOldQuantity, DWORD dItem, DWORD dQuantity) {
 #ifdef DEBUG
 	char pBuffer[MAX_PATH];
-	sprintf_s(pBuffer, "Item randomised | Old %08X (%i) | New %08X (%i)\n", dOldItem, dOldQuantity, dItem, dQuantity);
+	sprintf_s(pBuffer, "[%i] Item randomised | Old %08X (%i) | New %08X (%i)\n", CoreStruct->pItemArray[0], dOldItem, dOldQuantity, dItem, dQuantity);
 	printf_s(pBuffer);
 #endif
 };

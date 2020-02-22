@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <bitset>
 #include "INIReader.h"
 #include "MinHook/include/MinHook.h"
 
@@ -10,7 +11,7 @@
 #define ItemType_Accessory 2
 #define ItemType_Goods 4
 #define int3 __debugbreak();
-//#define DEBUG
+#define DEBUG
 
 #define FE_InitFailed 0
 #define FE_AmountTooHigh 1
@@ -21,6 +22,7 @@
 #define HE_InvalidItemType 6
 #define HE_InvalidInventoryEquipID 7
 #define HE_Undefined 8
+#define HE_NoPlayerChar 9
 
 #define MAX_LIST_ITEMS 1605
 
@@ -29,6 +31,7 @@ struct SEquipBuffer;
 
 typedef VOID fEquipItem(DWORD dSlot, SEquipBuffer* E);
 typedef VOID fDisplayGraveMessage(DWORD dEvent);
+typedef VOID fDisplayInfoMsg(DWORD64* pBuffer);
 
 class CCore {
 public:
@@ -41,6 +44,8 @@ public:
 	virtual VOID Panic(char* pMessage, char* pSort, DWORD dError, DWORD dIsFatalError);
 	virtual VOID DebugInit();
 	virtual VOID DisplayInfoMsg();
+	virtual VOID LockEquipSlots();
+	fDisplayInfoMsg* DisplayEquipLockMsg; //0x14075BC70
 private:
 	fDisplayGraveMessage* DisplayGraveMessage;
 };
@@ -62,7 +67,9 @@ public:
 	virtual BOOL SortItem(DWORD dItemID, SEquipBuffer* E);
 	virtual BOOL FindEquipType(DWORD dItem, DWORD* pArray);
 	virtual DWORD GetInventorySlotID(DWORD dItemID);
+	virtual VOID LockUnlockEquipSlots(int iIsUnlock);
 	fEquipItem* EquipItem; //0x140AFBBB0
+
 };
 
 struct SCore {
@@ -71,6 +78,7 @@ struct SCore {
 	DWORD dRandomsieHealItems;
 	DWORD dRandomiseKeyItems;
 	DWORD dIsAutoEquip;
+	DWORD dLockEquipSlots;
 	DWORD dIsNoWeaponRequirements;
 	DWORD dIsMessageActive;
 	DWORD dIsListChanged;

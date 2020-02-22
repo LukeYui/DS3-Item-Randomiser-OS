@@ -47,6 +47,7 @@ VOID CAutoEquip::AutoEquipItem(UINT_PTR pItemBuffer, DWORD64 qReturnAddress) {
 				Core->Panic("Bad function call", "...\\Source\\AutoEquip\\AutoEquip.cpp", FE_BadFunc, 1);
 				int3
 			};
+			LockUnlockEquipSlots(1);
 			AutoEquip->EquipItem(pEquipBuffer.dEquipSlot, &pEquipBuffer);
 		};
 	
@@ -130,6 +131,11 @@ DWORD CAutoEquip::GetInventorySlotID(DWORD dItemID) {
 
 	qInventoryPtr = *(UINT_PTR*)CoreStruct->qLocalPlayer;
 	qInventoryPtr = *(UINT_PTR*)(qInventoryPtr + 0x10);
+	if (!qInventoryPtr) {
+		Core->Panic("'Local Player' does not exist", "...\\Source\\AutoEquip\\AutoEquip.cpp", HE_NoPlayerChar, 1);
+		int3
+	};
+
 	qInventoryPtr = *(UINT_PTR*)(qInventoryPtr + 0x470);
 	qInventoryPtr = *(UINT_PTR*)(qInventoryPtr + 0x10);
 	qInventoryPtr += 0x1B8;
@@ -147,6 +153,45 @@ DWORD CAutoEquip::GetInventorySlotID(DWORD dItemID) {
 	};
 
 	return -1;
+};
+
+VOID CAutoEquip::LockUnlockEquipSlots(int iIsUnlock) {
+
+	UINT_PTR qWorldChrMan = 0;
+	DWORD dChrEquipAnimFlags = 0;
+
+	qWorldChrMan = *(UINT_PTR*)(CoreStruct->qWorldChrMan);
+	if (!qWorldChrMan) {
+		Core->Panic("WorldChrMan", "...\\Source\\AutoEquip\\AutoEquip.cpp", HE_NoPlayerChar, 1);
+		int3
+	};
+
+	qWorldChrMan = *(UINT_PTR*)(qWorldChrMan + 0x80);
+	if (!qWorldChrMan) {
+		Core->Panic("'WorldChr Player' does not exist", "...\\Source\\AutoEquip\\AutoEquip.cpp", HE_NoPlayerChar, 1);
+		int3
+	};
+
+	qWorldChrMan = *(UINT_PTR*)(qWorldChrMan + 0x1F90);
+	if (!qWorldChrMan) {
+		Core->Panic("'WorldChr Data' does not exist", "...\\Source\\AutoEquip\\AutoEquip.cpp", HE_NoPlayerChar, 0);
+		return;
+	};
+
+	qWorldChrMan = *(UINT_PTR*)(qWorldChrMan);
+	if (!qWorldChrMan) {
+		Core->Panic("'WorldChr Flags' does not exist", "...\\Source\\AutoEquip\\AutoEquip.cpp", HE_NoPlayerChar, 0);
+		return;
+	};
+
+	dChrEquipAnimFlags = *(DWORD*)(qWorldChrMan + 0x10);
+
+	if (iIsUnlock) dChrEquipAnimFlags |= 1;
+	else dChrEquipAnimFlags &= 0xFFFFFFFE;
+
+	*(DWORD*)(qWorldChrMan + 0x10) = dChrEquipAnimFlags;
+
+	return;
 };
 
 extern DWORD pHelmetList[110]{
