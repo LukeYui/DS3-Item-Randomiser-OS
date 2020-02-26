@@ -6,9 +6,7 @@ You can find the original mod here: [Item Randomiser and Auto-equip (Dark Souls 
 
 ## I want to make my own list
 
-To make your own list, you'll need to just swap out the "DS3ItemAoB.txt" file with a list of your own. You can do this without needing to edit the source code so long as it's a list of 1600 items.
-
-If you want to customise it further, with a custom length list, you'll need to edit the source code. You'll need to change the length of the arrays the code reads in `Core.cpp` to a number of your choosing, then it should work. You might also have to allocate more memory.
+To make your own list, you'll need to just swap out the "DS3ItemAoB.txt" file with a list of your own. Then run the AoBRandomiser.exe and create a custom list with how many items are in your list.
 
 If you want to make your own complex list, with exceptions and rules (e.g not infusing/upgrading certain weapons) you'll need to modify the hardcoded lists in the mod. You can find them in "ItemRandomiser\ItemRandomiser.cpp". I know my code is pretty horrible to look at though, so it might just be a case of trial and error until it works. I'll upload the AoBRandomiser.exe source later.
 

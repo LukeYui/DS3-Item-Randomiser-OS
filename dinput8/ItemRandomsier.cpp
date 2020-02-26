@@ -20,6 +20,8 @@ VOID CItemRandomiser::RandomiseItem(UINT_PTR qWorldChrMan, UINT_PTR pItemBuffer,
 	DWORD dItemID = 0;
 	DWORD dItemQuantity = 0;
 	DWORD dItemDurability = 0;
+	DWORD dOffsetMax = 0;
+	DWORD* pOffsetArray;
 
 	dItemAmount = *(int*)pItemBuffer;
 	pItemBuffer += 4;
@@ -34,6 +36,10 @@ VOID CItemRandomiser::RandomiseItem(UINT_PTR qWorldChrMan, UINT_PTR pItemBuffer,
 		dItemID = *(int*)(pItemBuffer);
 		dItemQuantity = *(int*)(pItemBuffer + 0x04);
 		dItemDurability = *(int*)(pItemBuffer + 0x08);
+		pOffsetArray = CoreStruct->pOffsetArray;
+		
+		dOffsetMax = *pOffsetArray;
+		pOffsetArray++;
 	
 		if (!CoreStruct->dRandomiseKeyItems) { //User preference "RandomiseKeys"
 			if (IsGameProgressionItem(dItemID)) return;
@@ -42,12 +48,12 @@ VOID CItemRandomiser::RandomiseItem(UINT_PTR qWorldChrMan, UINT_PTR pItemBuffer,
 			if ((dItemID == 0x4000085D ) || (dItemID == 0x4000085F)) return;
 		};
 
-		if (CoreStruct->pItemArray[0] < MAX_LIST_ITEMS) {
-			dItemID = CoreStruct->pItemArray[CoreStruct->pOffsetArray[CoreStruct->pItemArray[0]]]; //Grab new item
-			CoreStruct->pOffsetArray[CoreStruct->pItemArray[0]] = 0;
+		if (CoreStruct->pItemArray[0] < dOffsetMax) {
+			dItemID = CoreStruct->pItemArray[pOffsetArray[CoreStruct->pItemArray[0]]]; //Grab new item
+			pOffsetArray[CoreStruct->pItemArray[0]] = 0;
 		} 
 		else {
-			dItemID = CoreStruct->pItemArray[RandomiseNumber(1, MAX_LIST_ITEMS)]; //Default to random item list
+			dItemID = CoreStruct->pItemArray[RandomiseNumber(1, dOffsetMax)]; //Default to random item list
 		};
 
 		CoreStruct->pItemArray[0]++;
@@ -85,6 +91,13 @@ VOID CItemRandomiser::SortNewItem(DWORD* dItem, DWORD* dQuantity) {
 	DWORD dItemType = 0;
 	DWORD dItemSortID = 0;
 	BYTE bPlayerUpgradeLevel = 0;
+
+	if (!*dItem) {
+		Core->Panic("No item", "...\\Source\\ItemRandomiser\\ItemRandomiser.cpp", HE_InvalidItemType, 0);
+		*dItem = 0x400001F4;
+		*dQuantity = 1;
+		return;
+	};
 	
 	dItemType = (*dItem >> 0x1C);
 	dItemSortID = (*dItem & 0x0FFFFFF);
