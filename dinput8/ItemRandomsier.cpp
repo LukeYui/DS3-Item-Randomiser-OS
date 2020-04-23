@@ -53,6 +53,7 @@ VOID CItemRandomiser::RandomiseItem(UINT_PTR qWorldChrMan, UINT_PTR pItemBuffer,
 			pOffsetArray[CoreStruct->pItemArray[0]] = 0;
 		} 
 		else {
+			if (!dOffsetMax) dOffsetMax++;
 			dItemID = CoreStruct->pItemArray[RandomiseNumber(1, dOffsetMax)]; //Default to random item list
 		};
 
@@ -204,8 +205,13 @@ DWORD CItemRandomiser::RandomiseNumber(DWORD dMin, DWORD dMax) {
 		Core->Panic(pBuffer, "...\\Source\\ItemRandomiser\\ItemRandomiser.cpp", HE_Undefined, 0);
 		return 1;
 	};
+	if (dMax == 0) {
+		sprintf_s(pBuffer, "DIV 0 (Min = %i | Max = %i)", dMin, dMax);
+		Core->Panic(pBuffer, "...\\Source\\ItemRandomiser\\ItemRandomiser.cpp", HE_Undefined, 0);
+		return 1;
+	};
 
-	dGen = (DWORD)(__rdtsc() % dMax);
+	dGen = (DWORD)((DWORD)__rdtsc() % dMax);
 
 	if ((!dMin) || (dGen > dMin)) return dGen;
 
