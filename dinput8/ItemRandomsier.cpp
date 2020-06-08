@@ -211,11 +211,8 @@ DWORD CItemRandomiser::RandomiseNumber(DWORD dMin, DWORD dMax) {
 		return 1;
 	};
 
-	dGen = (DWORD)((DWORD)__rdtsc() % dMax);
-
-	if ((!dMin) || (dGen > dMin)) return dGen;
-
-	return dMin;
+    std::uniform_int_distribution<DWORD> dist{ dMin, dMax };
+    return dist(engine);
 };
 
 VOID CItemRandomiser::DebugItemPrint(DWORD dOldItem, DWORD dOldQuantity, DWORD dItem, DWORD dQuantity) {

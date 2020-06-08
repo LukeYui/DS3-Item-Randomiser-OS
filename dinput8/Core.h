@@ -3,6 +3,7 @@
 #include <string>
 #include <fstream>
 #include <bitset>
+#include <random>
 #include "INIReader.h"
 #include "MinHook/include/MinHook.h"
 
@@ -59,6 +60,9 @@ public:
 	virtual BOOL IsRestrictedGoods(DWORD dItemID);
 	virtual DWORD RandomiseNumber(DWORD dMin, DWORD dMax);
 	virtual VOID DebugItemPrint(DWORD dOldItem, DWORD dOldQuantity, DWORD dItem, DWORD dQuantity);
+private:
+    std::random_device rd;
+    std::mt19937 engine{ rd() };
 };
 
 class CAutoEquip {
