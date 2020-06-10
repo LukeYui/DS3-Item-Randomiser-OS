@@ -9,6 +9,7 @@ DWORD pHelmetList[110];
 DWORD pBodyList[105];
 DWORD pHandsList[100];
 DWORD pLegsList[105];
+DWORD pPureCatalysts[35];
 
 VOID fAutoEquip(UINT_PTR pItemBuffer, DWORD64 pItemData, DWORD64 qReturnAddress) {
 	if (*(int*)(pItemData) >= 0) AutoEquip->AutoEquipItem(pItemBuffer, qReturnAddress);
@@ -66,12 +67,13 @@ BOOL CAutoEquip::SortItem(DWORD dItemID, SEquipBuffer* E) {
 
 	dItemType = (dItemID >> 0x1C);
 
-	switch (dItemType) {
-	case(ItemType_Weapon): {
-		if ((dItemID >> 0x10) == 6) return false; //Don't equip ammo
-		if ((dItemID & 0xFF000000) << 4 != 0x10000000) dEquipSlot = 1; //If these conditions are met, it's a shield.
-		break;
-	};
+    switch (dItemType) {
+    case(ItemType_Weapon): {
+        if ((dItemID >> 0x10) == 6) return false; //Don't equip ammo
+        if (CoreStruct->dCatalystsLeftHand && IsPureCatalyst(dItemID)); //Equip staves,chimes,talismans in a left hand
+        else if ((dItemID & 0xFF000000) << 4 != 0x10000000) dEquipSlot = 1; //If these conditions are met, it's a shield.
+        break;
+    };
 	case(ItemType_Protector): {
 		if (FindEquipType(dItemID, &pHelmetList[0])) dEquipSlot = 0x0C;
 		else if (FindEquipType(dItemID, &pBodyList[0])) dEquipSlot = 0x0D;
@@ -121,6 +123,19 @@ BOOL CAutoEquip::FindEquipType(DWORD dItem, DWORD* pArray) {
 	};
 
 	return false;
+};
+
+BOOL CAutoEquip::IsPureCatalyst(DWORD dItem) {
+
+    int i = 0;
+    PDWORD pArray = pPureCatalysts;
+
+    while (*pArray) {
+        if ((dItem & 0xFFFFFFF0) == *pArray) return true;
+        pArray++;
+    };
+
+    return false;
 };
 
 DWORD CAutoEquip::GetInventorySlotID(DWORD dItemID) {
@@ -611,4 +626,35 @@ extern DWORD pLegsList[105]{
 	0x14DBA318,
 	0x14EAE558,
 	0x00000000,
+};
+
+extern DWORD pPureCatalysts[] = {
+    0x00C72090, // Talisman
+    0x00C747A0, // Sorcerer's Staff
+    0x00C76EB0, // Storyteller's Staff
+    0x00C795C0, // Mendicant's Staff
+    0x00C7E3E0, // Man-grub's Staff
+    0x00C80AF0, // Archdeacon's Great Staff
+    0x00C88020, // Yorshka's Chime
+    0x00C8CE40, // Sage's Crystal Staff
+    0x00C8F550, // Heretic's Staff
+    0x00C91C60, // Court Sorcerer's Staff
+    0x00C94370, // Witchtree Branch
+    0x00C96A80, // Izalith Staff
+    0x00C99190, // Cleric's Sacred Chime
+    0x00C9B8A0, // Priest's Chime
+    0x00C9DFB0, // Saint-tree Bellvine
+    0x00CA06C0, // Caitha's Chime
+    0x00CA2DD0, // Crystal Chime
+    0x00CA54E0, // Sunlight Talisman
+    0x00CA7BF0, // Canvas Talisman
+    0x00CAA300, // Sunless Talisman
+    0x00CACA10, // Saint's Talisman
+    0x00CAF120, // White Hair Talisman
+    0x00CC77C0, // Pyromancy Flame
+    0x00CC9ED0, // Pyromancer's Parting Flame
+    0x00CCC5E0, // Murky Longstaff
+    0x00CCECF0, // Sacred Chime of Filianore
+    0x00CD1400, // Preacher's Right Arm
+    0
 };

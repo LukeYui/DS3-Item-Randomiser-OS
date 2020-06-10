@@ -70,6 +70,7 @@ public:
 	virtual VOID AutoEquipItem(UINT_PTR pItemBuffer, DWORD64 qReturnAddress);
 	virtual BOOL SortItem(DWORD dItemID, SEquipBuffer* E);
 	virtual BOOL FindEquipType(DWORD dItem, DWORD* pArray);
+    virtual BOOL IsPureCatalyst(DWORD dItem);
 	virtual DWORD GetInventorySlotID(DWORD dItemID);
 	virtual VOID LockUnlockEquipSlots(int iIsUnlock);
 	fEquipItem* EquipItem; //0x140AFBBB0
@@ -82,6 +83,7 @@ struct SCore {
 	DWORD dRandomsieHealItems;
 	DWORD dRandomiseKeyItems;
 	DWORD dIsAutoEquip;
+    DWORD dCatalystsLeftHand;
 	DWORD dLockEquipSlots;
 	DWORD dIsNoWeaponRequirements;
 	DWORD dIsMessageActive;

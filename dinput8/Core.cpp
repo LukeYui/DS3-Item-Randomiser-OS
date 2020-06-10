@@ -87,6 +87,7 @@ BOOL CCore::Initialise() {
 	CoreStruct->dIsAutoEquip = reader.GetBoolean("AutoEquip", "AutoEquipToggle", true);
 	CoreStruct->dLockEquipSlots = reader.GetBoolean("AutoEquip", "LockEquipSlots", false);
 	CoreStruct->dIsNoWeaponRequirements = reader.GetBoolean("AutoEquip", "NoWeaponRequirements", false);
+    CoreStruct->dCatalystsLeftHand = reader.GetBoolean("AutoEquip", "CatalystsLeftHand", false);
 
 	CoreStruct->pOffsetArray = (DWORD*)HeapAlloc(CoreStruct->hHeap, 8, 0x3000);
 	CoreStruct->pItemArray = (DWORD*)HeapAlloc(CoreStruct->hHeap, 8, 0x3000);
@@ -111,6 +112,8 @@ BOOL CCore::Initialise() {
 	printf_s(pBuffer);
 	sprintf_s(pBuffer, "[AutoEquip] - NoWeaponRequirements = %i\n", CoreStruct->dIsNoWeaponRequirements);
 	printf_s(pBuffer);
+    sprintf_s(pBuffer, "[AutoEquip] - CatalystsLeftHand = %i\n", CoreStruct->dCatalystsLeftHand);
+    printf_s(pBuffer);
 #endif
 
 	GetArrayList();
