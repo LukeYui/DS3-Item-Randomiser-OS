@@ -4,6 +4,7 @@ CCore* Core;
 CItemRandomiser *ItemRandomiser;
 CAutoEquip *AutoEquip;
 SCore* CoreStruct;
+CItemHelpers ItemHelpers;
 
 DWORD64 qItemEquipComms = 0;
 

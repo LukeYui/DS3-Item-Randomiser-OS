@@ -6,6 +6,7 @@
 #include <random>
 #include "INIReader.h"
 #include "MinHook/include/MinHook.h"
+#include "CItemHelpers.h"
 
 #define ItemType_Weapon 0
 #define ItemType_Protector 1
@@ -24,6 +25,7 @@
 #define HE_InvalidInventoryEquipID 7
 #define HE_Undefined 8
 #define HE_NoPlayerChar 9
+#define HE_InvalidProtectorItem 10
 
 #define MAX_LIST_ITEMS 1605
 
@@ -69,12 +71,10 @@ class CAutoEquip {
 public:
 	virtual VOID AutoEquipItem(UINT_PTR pItemBuffer, DWORD64 qReturnAddress);
 	virtual BOOL SortItem(DWORD dItemID, SEquipBuffer* E);
-	virtual BOOL FindEquipType(DWORD dItem, DWORD* pArray);
-    virtual BOOL IsPureCatalyst(DWORD dItem);
+    virtual DWORD GetEquipSlot(DWORD dItem);
 	virtual DWORD GetInventorySlotID(DWORD dItemID);
 	virtual VOID LockUnlockEquipSlots(int iIsUnlock);
 	fEquipItem* EquipItem; //0x140AFBBB0
-
 };
 
 struct SCore {
