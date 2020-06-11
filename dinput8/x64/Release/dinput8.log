@@ -1,13 +1,1 @@
-﻿  AutoEquip.cpp
-  Core.cpp
-z:\re\public mods\ds3-item-randomiser-os\dinput8\core.cpp(72): warning C4101: 'pBuffer': unreferenced local variable
-  ItemRandomsier.cpp
-  NoRequirements.cpp
-  dinput8.cpp
-     Creating library Z:\RE\Public Mods\DS3-Item-Randomiser-OS\x64\Release\dinput8.lib and object Z:\RE\Public Mods\DS3-Item-Randomiser-OS\x64\Release\dinput8.exp
-  Generating code
-  17 of 415 functions ( 4.1%) were compiled, the rest were copied from previous compilation.
-    1 functions were new in current compilation
-    3 functions had inline decision re-evaluated but remain unchanged
-  Finished generating code
-  dinput8.vcxproj -> Z:\RE\Public Mods\DS3-Item-Randomiser-OS\x64\Release\dinput8.dll
+﻿
