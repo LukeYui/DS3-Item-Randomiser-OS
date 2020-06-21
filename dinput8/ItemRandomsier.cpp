@@ -20,8 +20,6 @@ VOID CItemRandomiser::RandomiseItem(UINT_PTR qWorldChrMan, UINT_PTR pItemBuffer,
 	DWORD dItemID = 0;
 	DWORD dItemQuantity = 0;
 	DWORD dItemDurability = 0;
-	DWORD dOffsetMax = 0;
-	DWORD* pOffsetArray;
 
 	dItemAmount = *(int*)pItemBuffer;
 	pItemBuffer += 4;
@@ -31,59 +29,63 @@ VOID CItemRandomiser::RandomiseItem(UINT_PTR qWorldChrMan, UINT_PTR pItemBuffer,
 		int3
 	};
 
-	while (dItemAmount) {
-	
-		dItemID = *(int*)(pItemBuffer);
-		dItemQuantity = *(int*)(pItemBuffer + 0x04);
-		dItemDurability = *(int*)(pItemBuffer + 0x08);
-		pOffsetArray = CoreStruct->pOffsetArray;
-		
-		dOffsetMax = *pOffsetArray;
-		pOffsetArray++;
-	
-		if (!CoreStruct->dRandomiseKeyItems) { //User preference "RandomiseKeys"
-			if (IsGameProgressionItem(dItemID)) return;
-		};
-		if (!CoreStruct->dRandomsieHealItems) { //User preference "RandomiseHeals"
-			if ((dItemID == 0x4000085D ) || (dItemID == 0x4000085F)) return;
-		};
+    for (; dItemAmount--; pItemBuffer += 0x0C) {
 
-		if (CoreStruct->pItemArray[0] < dOffsetMax) {
-			dItemID = CoreStruct->pItemArray[pOffsetArray[CoreStruct->pItemArray[0]]]; //Grab new item
-			pOffsetArray[CoreStruct->pItemArray[0]] = 0;
-		} 
-		else {
-			if (!dOffsetMax) dOffsetMax++;
-			dItemID = CoreStruct->pItemArray[RandomiseNumber(1, dOffsetMax)]; //Default to random item list
-		};
+        dItemID = *(int*)(pItemBuffer);
+        dItemQuantity = *(int*)(pItemBuffer + 0x04);
+        dItemDurability = *(int*)(pItemBuffer + 0x08);
 
-		CoreStruct->pItemArray[0]++;
+        if (!CoreStruct->dRandomiseKeyItems) { //User preference "RandomiseKeys"
+            if (IsGameProgressionItem(dItemID)) continue;
+        };
+        if (!CoreStruct->dRandomsieHealItems) { //User preference "RandomiseHeals"
+            if ((dItemID == 0x4000085D) || (dItemID == 0x4000085F)) continue;
+        };
 
-		SortNewItem(&dItemID, &dItemQuantity);
+        GetNewItem(&dItemID, &dItemQuantity);
+        SortNewItem(&dItemID, &dItemQuantity);
+        DebugItemPrint(*(int*)(pItemBuffer), *(int*)(pItemBuffer + 0x04), dItemID, dItemQuantity);
 
-		if ((dItemID == 0x4000085D) || (dItemID == 0x4000085F)) {
-			if (!CoreStruct->dRandomsieHealItems) dItemID = 0x400001F4;
-		};
-
-		if (!CoreStruct->dRandomiseKeyItems) {
-			if (IsGameProgressionItem(dItemID)) dItemID = 0x400001F4;
-		};
-
-		DebugItemPrint(*(int*)(pItemBuffer), *(int*)(pItemBuffer + 0x04), dItemID, dItemQuantity);
-		
-		*(int*)(pItemBuffer) = dItemID;
-		*(int*)(pItemBuffer + 0x04) = dItemQuantity;
-		*(int*)(pItemBuffer + 0x08) = -1;
-	
-		dItemAmount--;
-		pItemBuffer += 0x0C;
-	};
+        *(int*)(pItemBuffer) = dItemID;
+        *(int*)(pItemBuffer + 0x04) = dItemQuantity;
+        *(int*)(pItemBuffer + 0x08) = -1;
+    };
 
 	CoreStruct->dIsListChanged++;
 
 	return;
 
 };
+
+VOID CItemRandomiser::GetNewItem(DWORD* dItemID, DWORD* dItemQuantity) {
+
+    DWORD* pOffsetArray = CoreStruct->pOffsetArray;
+    DWORD dOffsetMax = *pOffsetArray;
+    pOffsetArray++;
+
+    if (CoreStruct->pItemArray[0] < dOffsetMax) {
+        *dItemID = CoreStruct->pItemArray[pOffsetArray[CoreStruct->pItemArray[0]]]; //Grab new item
+        pOffsetArray[CoreStruct->pItemArray[0]] = 0;
+    }
+    else {
+        if (!dOffsetMax) dOffsetMax++;
+        *dItemID = CoreStruct->pItemArray[RandomiseNumber(1, dOffsetMax)]; //Default to random item list
+    };
+
+    CoreStruct->pItemArray[0]++;
+
+    if ((*dItemID == 0x4000085D) || (*dItemID == 0x4000085F)) {
+        if (!CoreStruct->dRandomsieHealItems) {
+            GetNewItem(dItemID, dItemQuantity);
+        }
+    };
+
+    if (!CoreStruct->dRandomiseKeyItems) {
+        if (IsGameProgressionItem(*dItemID)) {
+            GetNewItem(dItemID, dItemQuantity);
+        }
+    };
+}
 
 VOID CItemRandomiser::SortNewItem(DWORD* dItem, DWORD* dQuantity) {
 
@@ -196,7 +198,6 @@ BOOL CItemRandomiser::IsRestrictedGoods(DWORD dItemID) {
 DWORD CItemRandomiser::RandomiseNumber(DWORD dMin, DWORD dMax) {
 
 	char pBuffer[MAX_PATH];
-	DWORD dGen = 0;
 
 	if (dMin > dMax) {
 		sprintf_s(pBuffer, "Defined minimum > maximum! %i > %i", dMin, dMax);

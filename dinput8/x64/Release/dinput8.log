@@ -1,1 +1,22 @@
-﻿
+﻿  Assembling _AutoEquip.asm...
+  Assembling _ItemRandomiser.asm...
+  Assembling _NoRequirements.asm...
+  Assembling dinput8_asm.asm...
+  AutoEquip.cpp
+  CItemHelpers.cpp
+  Core.cpp
+  dinput8.cpp
+  ini.cpp
+  INIReader.cpp
+  ItemRandomsier.cpp
+  NoRequirements.cpp
+  buffer.c
+  hde32.c
+  hde64.c
+  hook.c
+  trampoline.c
+     Creating library V:\Projects\GitHub.forks\DS3-Item-Randomiser\x64\Release\dinput8.lib and object V:\Projects\GitHub.forks\DS3-Item-Randomiser\x64\Release\dinput8.exp
+  Generating code
+  All 447 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  dinput8.vcxproj -> V:\Projects\GitHub.forks\DS3-Item-Randomiser\x64\Release\dinput8.dll
