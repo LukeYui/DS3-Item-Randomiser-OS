@@ -44,8 +44,11 @@ VOID CAutoEquip::AutoEquipItem(UINT_PTR pItemBuffer, DWORD64 qReturnAddress) {
 				Core->Panic("Bad function call", "...\\Source\\AutoEquip\\AutoEquip.cpp", FE_BadFunc, 1);
 				int3
 			};
-			LockUnlockEquipSlots(1);
-			AutoEquip->EquipItem(pEquipBuffer.dEquipSlot, &pEquipBuffer);
+
+            if (!IsInventoryItemEquipped(pEquipBuffer.dInventorySlot)) {
+                LockUnlockEquipSlots(1);
+                AutoEquip->EquipItem(pEquipBuffer.dEquipSlot, &pEquipBuffer);
+            }
 		};
 	
 		dItemAmount--;
@@ -75,6 +78,8 @@ BOOL CAutoEquip::SortItem(DWORD dItemID, SEquipBuffer* E) {
 		break;
 	};
 	case(ItemType_Accessory): {
+        if (!ItemHelpers.IsRing(dItemID)) return false;
+
 		if (dRingSlotSelect >= 0x15) dRingSlotSelect = 0x11;
 		dEquipSlot = dRingSlotSelect;
 		dRingSlotSelect++;
@@ -192,3 +197,10 @@ VOID CAutoEquip::LockUnlockEquipSlots(int iIsUnlock) {
 
 	return;
 };
+
+bool CAutoEquip::IsInventoryItemEquipped(int inventoryId) {
+    auto playerEquips = *(UINT_PTR*)CoreStruct->qLocalPlayer;
+    playerEquips = *(UINT_PTR*)(playerEquips + 0x10) + 0x228;
+
+    return FindEquippedSlot(playerEquips, inventoryId) != -1;
+}

@@ -33,6 +33,7 @@ struct SCore;
 struct SEquipBuffer;
 
 typedef VOID fEquipItem(DWORD dSlot, SEquipBuffer* E);
+typedef int  fFindEquippedSlot(UINT_PTR playerEquips, int inventorySlot);
 typedef VOID fDisplayGraveMessage(DWORD dEvent);
 typedef VOID fDisplayInfoMsg(DWORD64* pBuffer);
 
@@ -50,7 +51,7 @@ public:
 	virtual VOID LockEquipSlots();
 	fDisplayInfoMsg* DisplayEquipLockMsg; //0x14075BC70
 private:
-	fDisplayGraveMessage* DisplayGraveMessage;
+    fDisplayGraveMessage* DisplayGraveMessage{ (fDisplayGraveMessage*)0x140BE1990 };
 };
 
 class CItemRandomiser {
@@ -73,7 +74,11 @@ public:
     virtual DWORD GetEquipSlot(DWORD dItem);
 	virtual DWORD GetInventorySlotID(DWORD dItemID);
 	virtual VOID LockUnlockEquipSlots(int iIsUnlock);
-	fEquipItem* EquipItem; //0x140AFBBB0
+    fEquipItem* EquipItem{ (fEquipItem*)0x140AFBBB0 };
+    fFindEquippedSlot* FindEquippedSlot{ (fFindEquippedSlot*)0x140582850 };
+
+private:
+    bool IsInventoryItemEquipped(int inventoryId);
 };
 
 struct SCore {

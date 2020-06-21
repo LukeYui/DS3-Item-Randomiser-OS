@@ -134,9 +134,6 @@ BOOL CCore::Initialise() {
 	if (CoreStruct->dIsAutoEquip) bReturn &= Hook(0x1407BBE92, (DWORD64)&tAutoEquip, &rAutoEquip, 6);
 	if (CoreStruct->dIsNoWeaponRequirements) bReturn &= Hook(0x140C073B9, (DWORD64)&tNoWeaponRequirements, &rNoWeaponRequirements, 7);
 
-	AutoEquip->EquipItem = (fEquipItem*)0x140AFBBB0;
-	Core->DisplayGraveMessage = (fDisplayGraveMessage*)0x140BE1990;
-
 	return bReturn;
 };
 
