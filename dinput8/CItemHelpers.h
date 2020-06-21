@@ -3,6 +3,7 @@
 struct EquipParamProtector;
 struct EquipParamWeapon;
 struct EquipParamGoods;
+struct EquipParamAccessory;
 
 enum ParamTableType { EquipParamWeaponTable, EquipParamProtectorTable, EquipParamAccessoryTable, EquipParamGoodsTable};
 
@@ -12,10 +13,12 @@ class CItemHelpers {
 public:
     EquipParamWeapon * GetEquipParamWeapon(int itemId);
     EquipParamProtector * GetEquipParamProtector(int itemId);
+    EquipParamAccessory * GetEquipParamAccessory(int itemId);
     EquipParamGoods * GetEquipParamGoods(int itemId);
     bool IsWeaponFullyUpgradable(int itemId);
     bool IsWeaponInfusable(int itemId);
     bool IsCatalyst(int itemId);
+    bool IsRing(int itemId);
 
 private:
     const ParamFunc GetEquipParamWeaponInternal { (ParamFunc)0x140E33420 };
@@ -27,6 +30,46 @@ private:
 };
 
 #pragma region EquipParam structs
+
+struct EquipParamAccessory {
+    int	refId0;
+    int	sfxVariationId;
+    float	weight;
+    int	behaviorId;
+    int	basicPrice;
+    int	sellValue;
+    int	sortId;
+    int	qwcId;
+    short	equipModelId;
+    short	iconId;
+    short	shopLv;
+    short	trophySGradeId;
+    short	trophySeqId;
+    unsigned char	equipModelCategory;
+    unsigned char	equipModelGender;
+    unsigned char	accessoryCategory;
+    unsigned char	refCategory;
+    unsigned char	spEffectCategory;
+    int	vagrantItemLotId;
+    int	vagrantBonusEneDropItemLotId;
+    int	vagrantItemEneDropItemLotId;
+    bool	IsDeposit : 1;
+    bool	IsEquipOutBrake : 1;
+    bool	disableMultiDropShare : 1;
+    bool	IsDiscard : 1;
+    bool	IsBool : 1;
+    bool	res1 : 1;
+    bool	res2 : 1;
+    bool	res3 : 1;
+    int	Costvalue;
+    short	RingCompatibilityId;
+    unsigned char	VowId;
+    unsigned char	AchievementID;
+    int	refId1;
+    int	refId2;
+    int	refId3;
+    int	refId4;
+};
 
 struct EquipParamGoods
 {

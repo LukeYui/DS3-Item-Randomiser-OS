@@ -14,6 +14,12 @@ EquipParamProtector * CItemHelpers::GetEquipParamProtector(int itemId)
     return (EquipParamProtector*)ReversedGetParams(itemId, EquipParamWeaponTable);
 }
 
+EquipParamAccessory * CItemHelpers::GetEquipParamAccessory(int itemId)
+{
+    return (EquipParamAccessory*)ReversedGetParams(itemId, EquipParamAccessoryTable);
+}
+
+
 EquipParamGoods * CItemHelpers::GetEquipParamGoods(int itemId)
 {
     return (EquipParamGoods*)ReversedGetParams(itemId, EquipParamGoodsTable);
@@ -37,6 +43,18 @@ bool CItemHelpers::IsCatalyst(int itemId) {
     return false;
 }
 
+bool CItemHelpers::IsRing(int itemId) {
+
+    EquipParamAccessory* params = GetEquipParamAccessory(itemId & 0x0FFFFFFF);
+
+    if (params)
+    {
+        if (params->RingCompatibilityId != -1)
+            return true;
+    }
+    return false;
+}
+
 bool CItemHelpers::IsWeaponFullyUpgradable(int itemId) {
 
     EquipParamWeapon* params = GetEquipParamWeapon(itemId);
@@ -51,13 +69,15 @@ bool CItemHelpers::IsWeaponFullyUpgradable(int itemId) {
 
 bool CItemHelpers::IsWeaponInfusable(int itemId) {
 
-    const int infusionId = 100;
+    const int infusionId = 1500;
     EquipParamWeapon* params = GetEquipParamWeapon(itemId + infusionId);
 
     if (params)
     {
         // if (params->reinforceTypeId == infusionId) - this check is not reliable
         // `params` isn't null => weapon with infusion exists
+        // 1500 - isn't random value, if weapon is already infused (reinforceWeaponId might be 0) it will help to not infuse weapon twice. 
+
         return true;
     }
     return false;
