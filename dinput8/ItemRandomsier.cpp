@@ -3,9 +3,9 @@
 extern CCore* Core;
 extern CItemRandomiser *ItemRandomiser;
 extern SCore* CoreStruct;
+extern CItemHelpers ItemHelpers;
 DWORD pUniqueItems[25];
 DWORD pCappedItems[250];
-DWORD pSpecialWeapons[170];
 
 VOID fItemRandomiser(UINT_PTR qWorldChrMan, UINT_PTR pItemBuffer, UINT_PTR pItemData, DWORD64 qReturnAddress) {
 
@@ -20,8 +20,6 @@ VOID CItemRandomiser::RandomiseItem(UINT_PTR qWorldChrMan, UINT_PTR pItemBuffer,
 	DWORD dItemID = 0;
 	DWORD dItemQuantity = 0;
 	DWORD dItemDurability = 0;
-	DWORD dOffsetMax = 0;
-	DWORD* pOffsetArray;
 
 	dItemAmount = *(int*)pItemBuffer;
 	pItemBuffer += 4;
@@ -31,59 +29,63 @@ VOID CItemRandomiser::RandomiseItem(UINT_PTR qWorldChrMan, UINT_PTR pItemBuffer,
 		int3
 	};
 
-	while (dItemAmount) {
-	
-		dItemID = *(int*)(pItemBuffer);
-		dItemQuantity = *(int*)(pItemBuffer + 0x04);
-		dItemDurability = *(int*)(pItemBuffer + 0x08);
-		pOffsetArray = CoreStruct->pOffsetArray;
-		
-		dOffsetMax = *pOffsetArray;
-		pOffsetArray++;
-	
-		if (!CoreStruct->dRandomiseKeyItems) { //User preference "RandomiseKeys"
-			if (IsGameProgressionItem(dItemID)) return;
-		};
-		if (!CoreStruct->dRandomsieHealItems) { //User preference "RandomiseHeals"
-			if ((dItemID == 0x4000085D ) || (dItemID == 0x4000085F)) return;
-		};
+    for (; dItemAmount--; pItemBuffer += 0x0C) {
 
-		if (CoreStruct->pItemArray[0] < dOffsetMax) {
-			dItemID = CoreStruct->pItemArray[pOffsetArray[CoreStruct->pItemArray[0]]]; //Grab new item
-			pOffsetArray[CoreStruct->pItemArray[0]] = 0;
-		} 
-		else {
-			if (!dOffsetMax) dOffsetMax++;
-			dItemID = CoreStruct->pItemArray[RandomiseNumber(1, dOffsetMax)]; //Default to random item list
-		};
+        dItemID = *(int*)(pItemBuffer);
+        dItemQuantity = *(int*)(pItemBuffer + 0x04);
+        dItemDurability = *(int*)(pItemBuffer + 0x08);
 
-		CoreStruct->pItemArray[0]++;
+        if (!CoreStruct->dRandomiseKeyItems) { //User preference "RandomiseKeys"
+            if (IsGameProgressionItem(dItemID)) continue;
+        };
+        if (!CoreStruct->dRandomsieHealItems) { //User preference "RandomiseHeals"
+            if ((dItemID == 0x4000085D) || (dItemID == 0x4000085F)) continue;
+        };
 
-		SortNewItem(&dItemID, &dItemQuantity);
+        GetNewItem(&dItemID, &dItemQuantity);
+        SortNewItem(&dItemID, &dItemQuantity);
+        DebugItemPrint(*(int*)(pItemBuffer), *(int*)(pItemBuffer + 0x04), dItemID, dItemQuantity);
 
-		if ((dItemID == 0x4000085D) || (dItemID == 0x4000085F)) {
-			if (!CoreStruct->dRandomsieHealItems) dItemID = 0x400001F4;
-		};
-
-		if (!CoreStruct->dRandomiseKeyItems) {
-			if (IsGameProgressionItem(dItemID)) dItemID = 0x400001F4;
-		};
-
-		DebugItemPrint(*(int*)(pItemBuffer), *(int*)(pItemBuffer + 0x04), dItemID, dItemQuantity);
-		
-		*(int*)(pItemBuffer) = dItemID;
-		*(int*)(pItemBuffer + 0x04) = dItemQuantity;
-		*(int*)(pItemBuffer + 0x08) = -1;
-	
-		dItemAmount--;
-		pItemBuffer += 0x0C;
-	};
+        *(int*)(pItemBuffer) = dItemID;
+        *(int*)(pItemBuffer + 0x04) = dItemQuantity;
+        *(int*)(pItemBuffer + 0x08) = -1;
+    };
 
 	CoreStruct->dIsListChanged++;
 
 	return;
 
 };
+
+VOID CItemRandomiser::GetNewItem(DWORD* dItemID, DWORD* dItemQuantity) {
+
+    DWORD* pOffsetArray = CoreStruct->pOffsetArray;
+    DWORD dOffsetMax = *pOffsetArray;
+    pOffsetArray++;
+
+    if (CoreStruct->pItemArray[0] < dOffsetMax) {
+        *dItemID = CoreStruct->pItemArray[pOffsetArray[CoreStruct->pItemArray[0]]]; //Grab new item
+        pOffsetArray[CoreStruct->pItemArray[0]] = 0;
+    }
+    else {
+        if (!dOffsetMax) dOffsetMax++;
+        *dItemID = CoreStruct->pItemArray[RandomiseNumber(1, dOffsetMax)]; //Default to random item list
+    };
+
+    CoreStruct->pItemArray[0]++;
+
+    if ((*dItemID == 0x4000085D) || (*dItemID == 0x4000085F)) {
+        if (!CoreStruct->dRandomsieHealItems) {
+            GetNewItem(dItemID, dItemQuantity);
+        }
+    };
+
+    if (!CoreStruct->dRandomiseKeyItems) {
+        if (IsGameProgressionItem(*dItemID)) {
+            GetNewItem(dItemID, dItemQuantity);
+        }
+    };
+}
 
 VOID CItemRandomiser::SortNewItem(DWORD* dItem, DWORD* dQuantity) {
 
@@ -122,15 +124,25 @@ VOID CItemRandomiser::SortNewItem(DWORD* dItem, DWORD* dQuantity) {
 
 		if (!bPlayerUpgradeLevel) return;
 
-		if (IsWeaponSpecialType(*dItem)) {
-			bPlayerUpgradeLevel >>= 1;
-			*dItem += RandomiseNumber(0, bPlayerUpgradeLevel);
-			return;
-		};
+        bool infusable = ItemHelpers.IsWeaponInfusable(*dItem);
+        bool upgradable = ItemHelpers.IsWeaponFullyUpgradable(*dItem);
+        int infusionId = 0;
 
-		*dItem += RandomiseNumber(0, bPlayerUpgradeLevel);
-		*dItem += (RandomiseNumber(0, 15) * 100);
-	
+        if (infusable) {
+            infusionId = (RandomiseNumber(0, 15) * 100);
+        }
+
+        if (!upgradable) {
+            bPlayerUpgradeLevel >>= 1;
+        }
+
+        *dItem += RandomiseNumber(0, bPlayerUpgradeLevel);
+        *dItem += infusionId;
+
+#ifdef DEBUG
+        sprintf_s(pBuffer, "[Randomiser] - Weapon=%X upgradable=%i infusable=%i\n", *dItem, upgradable, infusable);
+        printf_s(pBuffer);
+#endif
 		return;
 	
 	};
@@ -171,18 +183,6 @@ BOOL CItemRandomiser::IsGameProgressionItem(DWORD dItemID) {
 	return false;
 };
 
-BOOL CItemRandomiser::IsWeaponSpecialType(DWORD dItemID) {
-
-	int i = 0;
-
-	while (pSpecialWeapons[i]) {
-		if (dItemID == pSpecialWeapons[i]) return true;
-		i++;
-	};
-
-	return false;
-};
-
 BOOL CItemRandomiser::IsRestrictedGoods(DWORD dItemID) {
 
 	int i = 0;
@@ -198,7 +198,6 @@ BOOL CItemRandomiser::IsRestrictedGoods(DWORD dItemID) {
 DWORD CItemRandomiser::RandomiseNumber(DWORD dMin, DWORD dMax) {
 
 	char pBuffer[MAX_PATH];
-	DWORD dGen = 0;
 
 	if (dMin > dMax) {
 		sprintf_s(pBuffer, "Defined minimum > maximum! %i > %i", dMin, dMax);
@@ -211,11 +210,8 @@ DWORD CItemRandomiser::RandomiseNumber(DWORD dMin, DWORD dMax) {
 		return 1;
 	};
 
-	dGen = (DWORD)((DWORD)__rdtsc() % dMax);
-
-	if ((!dMin) || (dGen > dMin)) return dGen;
-
-	return dMin;
+    std::uniform_int_distribution<DWORD> dist{ dMin, dMax };
+    return dist(engine);
 };
 
 VOID CItemRandomiser::DebugItemPrint(DWORD dOldItem, DWORD dOldQuantity, DWORD dItem, DWORD dQuantity) {
@@ -461,169 +457,3 @@ extern DWORD pCappedItems[250] = {
 	0x00000000,
 };
 
-extern DWORD pSpecialWeapons[170] = {
-	0x00D63BC0,
-	0x00D5EDA0,
-	0x00CC9ED0,
-	0x00CCC5E0,
-	0x003E8FA0,
-	0x0135E7F0,
-	0x002206F0,
-	0x00B80560,
-	0x00610BC0,
-	0x00F646E0,
-	0x00F69500,
-	0x00111700,
-	0x006132D0,
-	0x004CE780,
-	0x004C9960,
-	0x004D0E90,
-	0x014159A0,
-	0x01424400,
-	0x01504DC0,
-	0x01430750,
-	0x009A1D20,
-	0x0141F5E0,
-	0x0144B500,
-	0x01509BE0,
-	0x015074D0,
-	0x006BE130,
-	0x00015F90,
-	0x00061A80,
-	0x00061AE4,
-	0x00061B48,
-	0x00061BAC,
-	0x00061C10,
-	0x00061C74,
-	0x00061CD8,
-	0x00061D3C,
-	0x00062250,
-	0x00062318,
-	0x0006237C,
-	0x000623E0,
-	0x00062A20,
-	0x00062A84,
-	0x00062AE8,
-	0x00062B4C,
-	0x00062BB0,
-	0x00062C14,
-	0x00062C78,
-	0x001053B0,
-	0x00107AC0,
-	0x00116520,
-	0x00203230,
-	0x0020A760,
-	0x0020F580,
-	0x002143A0,
-	0x00222E00,
-	0x0021DFE0,
-	0x00225510,
-	0x00227C20,
-	0x002E6300,
-	0x002E8A10,
-	0x003E1A70,
-	0x003E4180,
-	0x003F04D0,
-	0x004D35A0,
-	0x005E2590,
-	0x005E4CA0,
-	0x005E9AC0,
-	0x005F0FF0,
-	0x005D8950,
-	0x005F5E10,
-	0x005F8520,
-	0x005FAC30,
-	0x005FD340,
-	0x005FFA50,
-	0x00602160,
-	0x00604870,
-	0x00606F80,
-	0x0060BDA0,
-	0x0060E4B0,
-	0x006C7D70,
-	0x006CA480,
-	0x006CCB90,
-	0x006D40C0,
-	0x006D8EE0,
-	0x007CAA10,
-	0x007CD120,
-	0x007CF830,
-	0x007D6D60,
-	0x007E09A0,
-	0x007E30B0,
-	0x007E7ED0,
-	0x007ECCF0,
-	0x007EF400,
-	0x008B01F0,
-	0x008B5010,
-	0x008B7720,
-	0x008BC540,
-	0x008BEC50,
-	0x008C3A70,
-	0x008CAFA0,
-	0x008CFDC0,
-	0x008D24D0,
-	0x008D4BE0,
-	0x009959D0,
-	0x0099A7F0,
-	0x009AE070,
-	0x009B0780,
-	0x009B55A0,
-	0x00A84DF0,
-	0x00A87500,
-	0x00B7B740,
-	0x00B82C70,
-	0x00C72090,
-	0x00C747A0,
-	0x00C76EB0,
-	0x00C795C0,
-	0x00C7E3E0,
-	0x00C80AF0,
-	0x00C83200,
-	0x00C88020,
-	0x00C8A730,
-	0x00C8CE40,
-	0x00C8F550,
-	0x00C91C60,
-	0x00C94370,
-	0x00C96A80,
-	0x00C99190,
-	0x00C9B8A0,
-	0x00C9DFB0,
-	0x00CA06C0,
-	0x00CA2DD0,
-	0x00CA54E0,
-	0x00CA7BF0,
-	0x00CAA300,
-	0x00CACA10,
-	0x00CAF120,
-	0x00CC77C0,
-	0x00CF8500,
-	0x00D5C690,
-	0x00D662D0,
-	0x00D689E0,
-	0x00D6B0F0,
-	0x00D6FF10,
-	0x00D72620,
-	0x00D79B50,
-	0x00D7C260,
-	0x00D7E970,
-	0x00D83790,
-	0x00D85EA0,
-	0x00D885B0,
-	0x00F4C040,
-	0x00F5F8C0,
-	0x013376F0,
-	0x014466E0,
-	0x0143CAA0,
-	0x01432E60,
-	0x01450320,
-	0x01452A30,
-	0x015EF3C0,
-	0x015F1AD0,
-	0x0150C2F0,
-	0x01511110,
-	0x01518640,
-	0x01437C80,
-	0x00000000,
-};

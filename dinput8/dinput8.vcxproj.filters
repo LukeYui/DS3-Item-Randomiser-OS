@@ -31,6 +31,9 @@
     <Filter Include="Source Files\ItemRandomiser">
       <UniqueIdentifier>{a66c2a1d-8bc7-4afe-a2f6-006f9d2e0610}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\ItemHelpers">
+      <UniqueIdentifier>{09f13648-d76b-4b99-89c8-467040f23dca}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dinput8.cpp">
@@ -68,6 +71,9 @@
     </ClCompile>
     <ClCompile Include="ItemRandomsier.cpp">
       <Filter>Source Files\ItemRandomiser</Filter>
+    </ClCompile>
+    <ClCompile Include="CItemHelpers.cpp">
+      <Filter>Source Files\ItemHelpers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -119,6 +125,9 @@
     </ClInclude>
     <ClInclude Include="MinHook\src\HDE\table64.h">
       <Filter>Resource Files\MinHook</Filter>
+    </ClInclude>
+    <ClInclude Include="CItemHelpers.h">
+      <Filter>Source Files\ItemHelpers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

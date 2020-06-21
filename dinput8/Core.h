@@ -3,8 +3,10 @@
 #include <string>
 #include <fstream>
 #include <bitset>
+#include <random>
 #include "INIReader.h"
 #include "MinHook/include/MinHook.h"
+#include "CItemHelpers.h"
 
 #define ItemType_Weapon 0
 #define ItemType_Protector 1
@@ -23,6 +25,7 @@
 #define HE_InvalidInventoryEquipID 7
 #define HE_Undefined 8
 #define HE_NoPlayerChar 9
+#define HE_InvalidProtectorItem 10
 
 #define MAX_LIST_ITEMS 1605
 
@@ -30,6 +33,7 @@ struct SCore;
 struct SEquipBuffer;
 
 typedef VOID fEquipItem(DWORD dSlot, SEquipBuffer* E);
+typedef int  fFindEquippedSlot(UINT_PTR playerEquips, int inventorySlot);
 typedef VOID fDisplayGraveMessage(DWORD dEvent);
 typedef VOID fDisplayInfoMsg(DWORD64* pBuffer);
 
@@ -47,29 +51,35 @@ public:
 	virtual VOID LockEquipSlots();
 	fDisplayInfoMsg* DisplayEquipLockMsg; //0x14075BC70
 private:
-	fDisplayGraveMessage* DisplayGraveMessage;
+    fDisplayGraveMessage* DisplayGraveMessage{ (fDisplayGraveMessage*)0x140BE1990 };
 };
 
 class CItemRandomiser {
 public:
 	virtual VOID RandomiseItem(UINT_PTR qWorldChrMan, UINT_PTR pItemBuffer, UINT_PTR pItemData, DWORD64 qReturnAddress);
+    virtual VOID GetNewItem(DWORD* dItem, DWORD* dQuantity);
 	virtual VOID SortNewItem(DWORD* dItem, DWORD* dQuantity);
 	virtual BOOL IsGameProgressionItem(DWORD dItemID);
-	virtual BOOL IsWeaponSpecialType(DWORD dItemID);
 	virtual BOOL IsRestrictedGoods(DWORD dItemID);
 	virtual DWORD RandomiseNumber(DWORD dMin, DWORD dMax);
 	virtual VOID DebugItemPrint(DWORD dOldItem, DWORD dOldQuantity, DWORD dItem, DWORD dQuantity);
+private:
+    std::random_device rd;
+    std::mt19937 engine{ rd() };
 };
 
 class CAutoEquip {
 public:
 	virtual VOID AutoEquipItem(UINT_PTR pItemBuffer, DWORD64 qReturnAddress);
 	virtual BOOL SortItem(DWORD dItemID, SEquipBuffer* E);
-	virtual BOOL FindEquipType(DWORD dItem, DWORD* pArray);
+    virtual DWORD GetEquipSlot(DWORD dItem);
 	virtual DWORD GetInventorySlotID(DWORD dItemID);
 	virtual VOID LockUnlockEquipSlots(int iIsUnlock);
-	fEquipItem* EquipItem; //0x140AFBBB0
+    fEquipItem* EquipItem{ (fEquipItem*)0x140AFBBB0 };
+    fFindEquippedSlot* FindEquippedSlot{ (fFindEquippedSlot*)0x140582850 };
 
+private:
+    bool IsInventoryItemEquipped(int inventoryId);
 };
 
 struct SCore {
@@ -78,6 +88,7 @@ struct SCore {
 	DWORD dRandomsieHealItems;
 	DWORD dRandomiseKeyItems;
 	DWORD dIsAutoEquip;
+    DWORD dCatalystsLeftHand;
 	DWORD dLockEquipSlots;
 	DWORD dIsNoWeaponRequirements;
 	DWORD dIsMessageActive;

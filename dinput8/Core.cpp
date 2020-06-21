@@ -4,6 +4,7 @@ CCore* Core;
 CItemRandomiser *ItemRandomiser;
 CAutoEquip *AutoEquip;
 SCore* CoreStruct;
+CItemHelpers ItemHelpers;
 
 DWORD64 qItemEquipComms = 0;
 
@@ -87,6 +88,7 @@ BOOL CCore::Initialise() {
 	CoreStruct->dIsAutoEquip = reader.GetBoolean("AutoEquip", "AutoEquipToggle", true);
 	CoreStruct->dLockEquipSlots = reader.GetBoolean("AutoEquip", "LockEquipSlots", false);
 	CoreStruct->dIsNoWeaponRequirements = reader.GetBoolean("AutoEquip", "NoWeaponRequirements", false);
+    CoreStruct->dCatalystsLeftHand = reader.GetBoolean("AutoEquip", "CatalystsLeftHand", false);
 
 	CoreStruct->pOffsetArray = (DWORD*)HeapAlloc(CoreStruct->hHeap, 8, 0x3000);
 	CoreStruct->pItemArray = (DWORD*)HeapAlloc(CoreStruct->hHeap, 8, 0x3000);
@@ -111,6 +113,8 @@ BOOL CCore::Initialise() {
 	printf_s(pBuffer);
 	sprintf_s(pBuffer, "[AutoEquip] - NoWeaponRequirements = %i\n", CoreStruct->dIsNoWeaponRequirements);
 	printf_s(pBuffer);
+    sprintf_s(pBuffer, "[AutoEquip] - CatalystsLeftHand = %i\n", CoreStruct->dCatalystsLeftHand);
+    printf_s(pBuffer);
 #endif
 
 	GetArrayList();
@@ -129,9 +133,6 @@ BOOL CCore::Initialise() {
 
 	if (CoreStruct->dIsAutoEquip) bReturn &= Hook(0x1407BBE92, (DWORD64)&tAutoEquip, &rAutoEquip, 6);
 	if (CoreStruct->dIsNoWeaponRequirements) bReturn &= Hook(0x140C073B9, (DWORD64)&tNoWeaponRequirements, &rNoWeaponRequirements, 7);
-
-	AutoEquip->EquipItem = (fEquipItem*)0x140AFBBB0;
-	Core->DisplayGraveMessage = (fDisplayGraveMessage*)0x140BE1990;
 
 	return bReturn;
 };

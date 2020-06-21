@@ -147,6 +147,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AutoEquip.cpp" />
+    <ClCompile Include="CItemHelpers.cpp" />
     <ClCompile Include="Core.cpp" />
     <ClCompile Include="dinput8.cpp" />
     <ClCompile Include="ini.cpp" />
@@ -169,6 +170,7 @@
     </MASM>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CItemHelpers.h" />
     <ClInclude Include="Core.h" />
     <ClInclude Include="ini.h" />
     <ClInclude Include="INIReader.h" />

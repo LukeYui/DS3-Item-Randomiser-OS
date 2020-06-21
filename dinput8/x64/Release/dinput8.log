@@ -1,13 +1,22 @@
-﻿  AutoEquip.cpp
+﻿  Assembling _AutoEquip.asm...
+  Assembling _ItemRandomiser.asm...
+  Assembling _NoRequirements.asm...
+  Assembling dinput8_asm.asm...
+  AutoEquip.cpp
+  CItemHelpers.cpp
   Core.cpp
-z:\re\public mods\ds3-item-randomiser-os\dinput8\core.cpp(72): warning C4101: 'pBuffer': unreferenced local variable
+  dinput8.cpp
+  ini.cpp
+  INIReader.cpp
   ItemRandomsier.cpp
   NoRequirements.cpp
-  dinput8.cpp
-     Creating library Z:\RE\Public Mods\DS3-Item-Randomiser-OS\x64\Release\dinput8.lib and object Z:\RE\Public Mods\DS3-Item-Randomiser-OS\x64\Release\dinput8.exp
+  buffer.c
+  hde32.c
+  hde64.c
+  hook.c
+  trampoline.c
+     Creating library V:\Projects\GitHub.forks\DS3-Item-Randomiser\x64\Release\dinput8.lib and object V:\Projects\GitHub.forks\DS3-Item-Randomiser\x64\Release\dinput8.exp
   Generating code
-  17 of 415 functions ( 4.1%) were compiled, the rest were copied from previous compilation.
-    1 functions were new in current compilation
-    3 functions had inline decision re-evaluated but remain unchanged
+  All 447 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
   Finished generating code
-  dinput8.vcxproj -> Z:\RE\Public Mods\DS3-Item-Randomiser-OS\x64\Release\dinput8.dll
+  dinput8.vcxproj -> V:\Projects\GitHub.forks\DS3-Item-Randomiser\x64\Release\dinput8.dll
